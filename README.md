@@ -4,6 +4,8 @@ This is a mod for the game RimWorld by Ludeon Studios.
 
 It enhances doctors to treat patients in priority order based upon disease immunity differential and bleed rate.
 
+This mod is dedicated to Abruno, Pooki, Inox, and Muffalo 45 - 64, who bravely gave their lives defending Seahorse's Rest in the Great Infestation of 5504. Perhaps, with this mod, more of you might have lived.
+
 # Table of Contents
 
 * [Introduction and Explanation](#introduction-and-explanation)
