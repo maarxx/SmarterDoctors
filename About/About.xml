@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ModMetaData>
+  <name>SmarterDoctors</name>
+  <author>Maarx</author>
+  <url>https://github.com/maarxx/SmarterDoctors/</url>
+  <supportedVersions>
+    <li>1.0</li>
+  </supportedVersions>
+  <description>Doctors now Tend in sorted priority order based upon bleed rate and immunity differential.</description>
+</ModMetaData>
