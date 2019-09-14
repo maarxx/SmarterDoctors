@@ -22,7 +22,7 @@ namespace SmarterDoctors
 
     class Computations
     {
-        public static float computePriority(Pawn worker, Pawn target)
+        public static float computeTendPriority(Pawn worker, Pawn target)
         {
             bool isSick = target.health.hediffSet.HasImmunizableNotImmuneHediff();
             int ticksToBleedOut = HealthUtility.TicksUntilDeathDueToBloodLoss(target);
@@ -37,10 +37,22 @@ namespace SmarterDoctors
             {
                 priority = ((float)Math.Pow(10, 10)) - ticksToBleedOut;
             }
-            //Log.Message("Hello from computePriority with pawn: " + target.Name.ToStringShort + ", priority: " + priority);
+            //Log.Message("Hello from computeTendPriority with pawn: " + target.Name.ToStringShort + ", priority: " + priority);
 
             return priority;
         }
+
+        public static float computeFeedPriority(Pawn worker, Pawn target)
+        {
+            float priority = 0;
+            Hediff malnutrition = target.health.hediffSet.GetFirstHediffOfDef(HediffDefOf.Malnutrition);
+            if (target.needs.food.CurLevel == 0f && malnutrition != null)
+            {
+                priority = malnutrition.Severity;
+            }
+            return priority;
+        }
+
 
         //https://github.com/Mehni/kNumbers/blob/fc9320b45bc0a8c41b2f2c67f68107fb89e84848/Numbers/PawnColumnWorkers/PawnColumnWorker_DiseaseProgression.cs#L152
         private static float FindMostSevereHediffDelta(Pawn pawn)
@@ -83,10 +95,21 @@ namespace SmarterDoctors
                 //Log.Message("Hello from Harmony WorkGiver_Tend GetPriority Postfix with old result:" + __result);
                 if (__result == 0f)
                 {
-                    __result = Computations.computePriority(pawn, (Pawn)t.Thing);
+                    __result = Computations.computeTendPriority(pawn, (Pawn)t.Thing);
                 }
                 //Log.Message("Bybye from Harmony WorkGiver_Tend GetPriority Postfix with new result:" + __result);
             }
+            else if (__instance is WorkGiver_FeedPatient)
+            {
+                //Log.Message("Hello from Harmony WorkGiver_Tend GetPriority Postfix with type: " + __instance.GetType());
+                //Log.Message("Hello from Harmony WorkGiver_Tend GetPriority Postfix with old result:" + __result);
+                if (__result == 0f)
+                {
+                    __result = Computations.computeFeedPriority(pawn, (Pawn)t.Thing);
+                }
+                //Log.Message("Bybye from Harmony WorkGiver_Tend GetPriority Postfix with new result:" + __result);
+            }
+
         }
     }
 
@@ -97,7 +120,7 @@ namespace SmarterDoctors
         static void Postfix(WorkGiver_Scanner __instance, ref bool __result)
         {
             //Log.Message("Hello from Harmony WorkGiver_Scanner Prioritized Postfix with type: " + __instance.GetType());
-            if (__instance is WorkGiver_Tend)
+            if (__instance is WorkGiver_Tend || __instance is WorkGiver_FeedPatient)
             {
                 //Log.Message("Hello from Harmony WorkGiver_Tend Prioritized Postfix with result:" + __result);
                 __result = true;
