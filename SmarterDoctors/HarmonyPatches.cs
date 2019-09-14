@@ -88,28 +88,20 @@ namespace SmarterDoctors
     {
         static void Postfix(WorkGiver_Scanner __instance, ref Pawn pawn, ref TargetInfo t, ref float __result)
         {
-            //Log.Message("Hello from Harmony WorkGiver_Scanner GetPriority Postfix with type: " + __instance.GetType());
             if (__instance is WorkGiver_Tend)
             {
-                //Log.Message("Hello from Harmony WorkGiver_Tend GetPriority Postfix with type: " + __instance.GetType());
-                //Log.Message("Hello from Harmony WorkGiver_Tend GetPriority Postfix with old result:" + __result);
                 if (__result == 0f)
                 {
                     __result = Computations.computeTendPriority(pawn, (Pawn)t.Thing);
                 }
-                //Log.Message("Bybye from Harmony WorkGiver_Tend GetPriority Postfix with new result:" + __result);
             }
             else if (__instance is WorkGiver_FeedPatient)
             {
-                //Log.Message("Hello from Harmony WorkGiver_Tend GetPriority Postfix with type: " + __instance.GetType());
-                //Log.Message("Hello from Harmony WorkGiver_Tend GetPriority Postfix with old result:" + __result);
                 if (__result == 0f)
                 {
                     __result = Computations.computeFeedPriority(pawn, (Pawn)t.Thing);
                 }
-                //Log.Message("Bybye from Harmony WorkGiver_Tend GetPriority Postfix with new result:" + __result);
             }
-
         }
     }
 
@@ -119,12 +111,9 @@ namespace SmarterDoctors
     {
         static void Postfix(WorkGiver_Scanner __instance, ref bool __result)
         {
-            //Log.Message("Hello from Harmony WorkGiver_Scanner Prioritized Postfix with type: " + __instance.GetType());
             if (__instance is WorkGiver_Tend || __instance is WorkGiver_FeedPatient)
             {
-                //Log.Message("Hello from Harmony WorkGiver_Tend Prioritized Postfix with result:" + __result);
                 __result = true;
-                //Log.Message("Goodbye from Harmony WorkGiver_Tend Prioritized Postfix with result:" + __result);
             }
         }
     }
