@@ -95,7 +95,7 @@ namespace SmarterDoctors
             TrainableDef nextTrain = train.NextTrainableToTrain();
             MethodInfo dynMethod = train.GetType().GetMethod("GetSteps", BindingFlags.Instance | BindingFlags.NonPublic);
             int steps = (int) dynMethod.Invoke(train, new object[] { nextTrain });
-            Log.Message("Hello from computeTrainPriority with pawn: " + target.Name.ToStringShort + ", " + nextTrain.defName + ", " + steps);
+            //Log.Message("Hello from computeTrainPriority with pawn: " + target.Name.ToStringShort + ", " + nextTrain.defName + ", " + steps);
             float priority = trainmap[nextTrain.defName] + steps;
             return priority;
         }
