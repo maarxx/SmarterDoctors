@@ -79,6 +79,26 @@ namespace SmarterDoctors
 
             return delta;
         }
+
+        static Dictionary<string, float> trainmap = new Dictionary<string, float>
+        {
+            { "Tameness", 500f },
+            { "Haul", 400f },
+            { "Rescue", 300f },
+            { "Release", 200f },
+            { "Obedience", 100f }
+        };
+        public static float computeTrainPriority(Pawn worker, Pawn target)
+        {
+
+            Pawn_TrainingTracker train = target.training;
+            TrainableDef nextTrain = train.NextTrainableToTrain();
+            MethodInfo dynMethod = train.GetType().GetMethod("GetSteps", BindingFlags.Instance | BindingFlags.NonPublic);
+            int steps = (int) dynMethod.Invoke(train, new object[] { nextTrain });
+            Log.Message("Hello from computeTrainPriority with pawn: " + target.Name.ToStringShort + ", " + nextTrain.defName + ", " + steps);
+            float priority = trainmap[nextTrain.defName] + steps;
+            return priority;
+        }
     }
 
     [HarmonyPatch(typeof(WorkGiver_Scanner))]
@@ -102,6 +122,13 @@ namespace SmarterDoctors
                     __result = Computations.computeFeedPriority(pawn, (Pawn)t.Thing);
                 }
             }
+            else if (__instance is WorkGiver_Train)
+            {
+                if (__result == 0f)
+                {
+                    __result = Computations.computeTrainPriority(pawn, (Pawn)t.Thing);
+                }
+            }
         }
     }
 
@@ -111,7 +138,7 @@ namespace SmarterDoctors
     {
         static void Postfix(WorkGiver_Scanner __instance, ref bool __result)
         {
-            if (__instance is WorkGiver_Tend || __instance is WorkGiver_FeedPatient)
+            if (__instance is WorkGiver_Tend || __instance is WorkGiver_FeedPatient || __instance is WorkGiver_Train)
             {
                 __result = true;
             }
