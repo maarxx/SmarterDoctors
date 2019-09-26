@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Verse;
+using Verse.AI;
 
 namespace SmarterDoctors
 {
@@ -107,6 +108,12 @@ namespace SmarterDoctors
             }
             return priority;
         }
+
+        public static float computeGrowerPriority(Pawn p, TargetInfo t)
+        {
+            FertilityGrid myGrid = new FertilityGrid(t.Map);
+            return myGrid.FertilityAt(t.Cell);
+        }
     }
 
     [HarmonyPatch(typeof(WorkGiver_Scanner))]
@@ -137,6 +144,20 @@ namespace SmarterDoctors
                     __result = Computations.computeTrainPriority(pawn, (Pawn)t.Thing);
                 }
             }
+            else if (__instance is WorkGiver_GrowerSow)
+            {
+                if (__result == 0f)
+                {
+                    __result = Computations.computeGrowerPriority(pawn, t);
+                }
+            }
+            else if (__instance is WorkGiver_GrowerHarvest)
+            {
+                if (__result == 0f)
+                {
+                    __result = Computations.computeGrowerPriority(pawn, t);
+                }
+            }
         }
     }
 
@@ -146,10 +167,48 @@ namespace SmarterDoctors
     {
         static void Postfix(WorkGiver_Scanner __instance, ref bool __result)
         {
-            if (__instance is WorkGiver_Tend || __instance is WorkGiver_FeedPatient || __instance is WorkGiver_Train)
+            if (__instance is WorkGiver_Tend ||
+                __instance is WorkGiver_FeedPatient ||
+                __instance is WorkGiver_Train ||
+                __instance is WorkGiver_GrowerSow ||
+                __instance is WorkGiver_GrowerHarvest)
             {
                 __result = true;
             }
+        }
+    }
+
+    [HarmonyPatch(typeof(WorkGiver_RescueDowned))]
+    [HarmonyPatch("HasJobOnThing")]
+    class Patch_WorkGiver_RescueDowned_HasJobOnThing
+    {
+        static void Postfix(WorkGiver_RescueDowned __instance, ref Pawn pawn, ref Thing t, ref bool forced, ref bool __result)
+        {
+            // mostly the original method, repeated, with three commented changes
+
+            if (__result == true) return; //new guard clause
+
+            Pawn pawn2 = t as Pawn;
+            //if (pawn2 != null && pawn2.Downed && pawn2.Faction == pawn.Faction && !pawn2.InBed())
+            if (pawn2 != null && pawn2.Downed && pawn.Map.designationManager.DesignationOn(pawn2, DesignationDefOf.Tame) != null && !pawn2.InBed())
+            {
+                LocalTargetInfo target = pawn2;
+                bool ignoreOtherReservations = forced;
+                if (pawn.CanReserve(target, 1, -1, null, ignoreOtherReservations) && !GenAI.EnemyIsNear(pawn2, 40f))
+                {
+                    //Thing thing = FindBed(pawn, pawn2);
+                    Thing thing = RestUtility.FindBedFor(pawn2, pawn, pawn2.HostFaction == pawn.Faction, checkSocialProperness: false);
+                    if (thing != null && pawn2.CanReserve(thing))
+                    {
+                        __result = true;
+                        return;
+                    }
+                    __result = false;
+                    return;
+                }
+            }
+            __result = false;
+            return;
         }
     }
 }
