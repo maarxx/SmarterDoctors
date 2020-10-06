@@ -1,4 +1,4 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace SmarterDoctors
         static Main()
         {
             //Log.Message("Hello from Harmony in scope: com.github.harmony.rimworld.maarx.smarterdoctors");
-            var harmony = HarmonyInstance.Create("com.github.harmony.rimworld.maarx.smarterdoctors");
+            var harmony = new Harmony("com.github.harmony.rimworld.maarx.smarterdoctors");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
         }
     }
