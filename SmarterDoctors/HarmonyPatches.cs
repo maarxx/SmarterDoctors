@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using UnityEngine;
 using Verse;
 using Verse.AI;
 
@@ -209,6 +210,69 @@ namespace SmarterDoctors
             }
             __result = false;
             return;
+        }
+    }
+
+    //[HarmonyPatch(typeof(JobDriver_Repair))]
+    //[HarmonyPatch("MakeNewToils")]
+    class Patch_JobDriver_Repair_MakeNewToils
+    {
+        static bool Prefix(JobDriver_Repair __instance, ref IEnumerable<Toil> __result)
+        {
+            JobDriver_Repair new_this = __instance;
+
+            List<Toil> new_result = new List<Toil>();
+
+            BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.NonPublic;
+
+            FieldInfo field_ticksToNextRepair = typeof(JobDriver_Repair).GetField("ticksToNextRepair", bindFlags);
+            float new_ticksToNextRepair = (float)field_ticksToNextRepair.GetValue(__instance);
+
+            PropertyInfo field_baseTargetThingA = typeof(JobDriver_Repair).GetProperty("TargetThingA", bindFlags);
+            Thing new_baseTargetThingA = (Thing)field_baseTargetThingA.GetValue(__instance);
+
+            PropertyInfo field_baseMap = typeof(JobDriver_Repair).GetProperty("Map", bindFlags);
+            Map new_baseMap = (Map)field_baseMap.GetValue(__instance);
+
+
+            //new_this.FailOnDespawnedOrNull(TargetIndex.A);
+            new_result.Add(Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.Touch));
+            Toil repair = new Toil();
+            repair.initAction = delegate
+            {
+                //ticksToNextRepair = 80f;
+                field_ticksToNextRepair.SetValue(__instance, 80f);
+            };
+            repair.tickAction = delegate
+            {
+                Pawn actor = repair.actor;
+                actor.skills.Learn(SkillDefOf.Construction, 0.05f);
+                float num = actor.GetStatValue(StatDefOf.ConstructionSpeed) * 1.7f;
+                //ticksToNextRepair -= num;
+                field_ticksToNextRepair.SetValue(__instance, ((float)field_ticksToNextRepair.GetValue(__instance)) - num);
+
+                if (((float)field_ticksToNextRepair.GetValue(__instance)) <= 0f)
+                {
+                    //ticksToNextRepair += 20f;
+                    field_ticksToNextRepair.SetValue(__instance, ((float)field_ticksToNextRepair.GetValue(__instance)) + 20f);
+
+                    new_baseTargetThingA.HitPoints++;
+                    new_baseTargetThingA.HitPoints = Mathf.Min(new_baseTargetThingA.HitPoints, new_baseTargetThingA.MaxHitPoints);
+                    new_baseMap.listerBuildingsRepairable.Notify_BuildingRepaired((Building)new_baseTargetThingA);
+                    if (new_baseTargetThingA.HitPoints == new_baseTargetThingA.MaxHitPoints)
+                    {
+                        actor.records.Increment(RecordDefOf.ThingsRepaired);
+                        actor.jobs.EndCurrentJob(JobCondition.Succeeded);
+                    }
+                }
+            };
+            repair.FailOnCannotTouch(TargetIndex.A, PathEndMode.Touch);
+            repair.WithEffect(new_baseTargetThingA.def.repairEffect, TargetIndex.A);
+            repair.defaultCompleteMode = ToilCompleteMode.Never;
+            repair.activeSkill = (() => SkillDefOf.Construction);
+            new_result.Add(repair);
+            __result = new_result.AsEnumerable<Toil>();
+            return false;
         }
     }
 }
