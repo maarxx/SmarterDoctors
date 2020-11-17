@@ -115,6 +115,23 @@ namespace SmarterDoctors
             FertilityGrid myGrid = new FertilityGrid(t.Map);
             return myGrid.FertilityAt(t.Cell);
         }
+
+        public static float computeConstructPriority(Pawn p, Frame f)
+        {
+            if (f.def.entityDefToBuild.defName == "TrapSpike")
+            {
+                return 25f;
+            }
+            else if(f.def.entityDefToBuild is TerrainDef)
+            {
+                return 50f;
+            }
+            else 
+            {
+                return 100f;
+            }
+            
+        }
     }
 
     [HarmonyPatch(typeof(WorkGiver_Scanner))]
@@ -159,6 +176,13 @@ namespace SmarterDoctors
                     __result = Computations.computeGrowerPriority(pawn, t);
                 }
             }
+            else if (__instance is WorkGiver_ConstructFinishFrames)
+            {
+                if (__result == 0f)
+                {
+                    __result = Computations.computeConstructPriority(pawn, (Frame)t);
+                }
+            }
         }
     }
 
@@ -172,7 +196,8 @@ namespace SmarterDoctors
                 __instance is WorkGiver_FeedPatient ||
                 __instance is WorkGiver_Train ||
                 __instance is WorkGiver_GrowerSow ||
-                __instance is WorkGiver_GrowerHarvest)
+                __instance is WorkGiver_GrowerHarvest ||
+                __instance is WorkGiver_ConstructFinishFrames)
             {
                 __result = true;
             }
