@@ -242,6 +242,7 @@ namespace SmarterDoctors
     //[HarmonyPatch("MakeNewToils")]
     class Patch_JobDriver_Repair_MakeNewToils
     {
+        // I wanted them to repair forbidden doors, but can't get it working.
         static bool Prefix(JobDriver_Repair __instance, ref IEnumerable<Toil> __result)
         {
             JobDriver_Repair new_this = __instance;
