@@ -132,6 +132,24 @@ namespace SmarterDoctors
             }
             
         }
+
+        public static float computeRescuePriority(Pawn p, Pawn t)
+        {
+            if (t.IsColonist)
+            {
+                return 50f;
+            }
+            else if (t.AnimalOrWildMan())
+            {
+                return 25f;
+            }
+            else
+            {
+                return 0f;
+            }
+
+        }
+
     }
 
     [HarmonyPatch(typeof(WorkGiver_Scanner))]
@@ -183,6 +201,13 @@ namespace SmarterDoctors
                     __result = Computations.computeConstructPriority(pawn, (Frame)t);
                 }
             }
+            else if (__instance is WorkGiver_RescueDowned)
+            {
+                if (__result == 0f)
+                {
+                    __result = Computations.computeRescuePriority(pawn, (Pawn)t);
+                }
+            }
         }
     }
 
@@ -197,7 +222,8 @@ namespace SmarterDoctors
                 __instance is WorkGiver_Train ||
                 __instance is WorkGiver_GrowerSow ||
                 __instance is WorkGiver_GrowerHarvest ||
-                __instance is WorkGiver_ConstructFinishFrames)
+                __instance is WorkGiver_ConstructFinishFrames ||
+                __instance is WorkGiver_RescueDowned)
             {
                 __result = true;
             }
