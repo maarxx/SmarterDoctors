@@ -113,7 +113,15 @@ namespace SmarterDoctors
         public static float computeGrowerPriority(Pawn p, TargetInfo t)
         {
             FertilityGrid myGrid = new FertilityGrid(t.Map);
-            return myGrid.FertilityAt(t.Cell);
+            float priority = myGrid.FertilityAt(t.Cell);
+            Zone zone = p.Map.zoneManager.ZoneAt(t.Cell);
+            if (zone != null &&
+                zone is Zone_Growing &&
+                (zone as Zone_Growing).GetPlantDefToGrow().defName == "Plant_Haygrass")
+            {
+                priority -= 1;
+            }
+            return priority;
         }
 
         public static float computeConstructPriority(Pawn p, Frame f)
