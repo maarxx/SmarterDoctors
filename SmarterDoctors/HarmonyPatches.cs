@@ -110,6 +110,18 @@ namespace SmarterDoctors
             return priority;
         }
 
+        public static float computePlantCutPriority(Pawn p, TargetInfo t)
+        {
+            if (t.HasThing && t.Thing.def.defName == "Plant_Haygrass")
+            {
+                return 80f;
+            }
+            else
+            {
+                return 100f;
+            }
+        }
+
         public static float computeGrowerPriority(Pawn p, TargetInfo t)
         {
             FertilityGrid myGrid = new FertilityGrid(t.Map);
@@ -188,6 +200,13 @@ namespace SmarterDoctors
                     __result = Computations.computeTrainPriority(pawn, (Pawn)t.Thing);
                 }
             }
+            else if (__instance is WorkGiver_PlantsCut)
+            {
+                if (__result == 0f)
+                {
+                    __result = Computations.computePlantCutPriority(pawn, t);
+                }
+            }
             else if (__instance is WorkGiver_GrowerSow)
             {
                 if (__result == 0f)
@@ -228,6 +247,7 @@ namespace SmarterDoctors
             if (__instance is WorkGiver_Tend ||
                 __instance is WorkGiver_FeedPatient ||
                 __instance is WorkGiver_Train ||
+                __instance is WorkGiver_PlantsCut ||
                 __instance is WorkGiver_GrowerSow ||
                 __instance is WorkGiver_GrowerHarvest ||
                 __instance is WorkGiver_ConstructFinishFrames ||
