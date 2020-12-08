@@ -3,8 +3,20 @@
   <name>SmarterDoctors</name>
   <author>Maarx</author>
   <url>https://github.com/maarxx/SmarterDoctors/</url>
+  <description>Many more Jobs are done in a smart priority sorted order, instead of just randomly.</description>
+  <packageId>maarx.smarterdoctors</packageId>
   <supportedVersions>
-    <li>1.0</li>
+    <li>1.2</li>
   </supportedVersions>
-  <description>Doctors now Tend in sorted priority order based upon bleed rate and immunity differential.</description>
+  <modDependencies>
+    <li>
+      <packageId>brrainz.harmony</packageId>
+      <displayName>Harmony</displayName>
+      <steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
+      <downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
+    </li>
+  </modDependencies>
+  <loadAfter>
+    <li>brrainz.harmony</li>
+  </loadAfter>
 </ModMetaData>
