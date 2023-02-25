@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using RimWorld;
+using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -269,89 +270,61 @@ namespace SmarterDoctors
             if (__result == true) return; //new guard clause
 
             Pawn pawn2 = t as Pawn;
-            //if (pawn2 != null && pawn2.Downed && pawn2.Faction == pawn.Faction && !pawn2.InBed())
-            if (pawn2 != null && pawn2.Downed && pawn.Map.designationManager.DesignationOn(pawn2, DesignationDefOf.Tame) != null && !pawn2.InBed())
+          //if (pawn2 == null || !pawn2.Downed || pawn2.Faction != pawn.Faction                                                   || pawn2.InBed() || pawn2.IsCharging() || !pawn.CanReserve(pawn2, 1, -1, null, forced) || GenAI.EnemyIsNear(pawn2, 40f) || CaravanFormingUtility.IsFormingCaravanOrDownedPawnToBeTakenByCaravan(pawn2))
+            if (pawn2 == null || !pawn2.Downed || pawn.Map.designationManager.DesignationOn(pawn2, DesignationDefOf.Tame) != null || pawn2.InBed() || pawn2.IsCharging() || !pawn.CanReserve(pawn2, 1, -1, null, forced) || GenAI.EnemyIsNear(pawn2, 40f) || CaravanFormingUtility.IsFormingCaravanOrDownedPawnToBeTakenByCaravan(pawn2))
             {
-                LocalTargetInfo target = pawn2;
-                bool ignoreOtherReservations = forced;
-                if (pawn.CanReserve(target, 1, -1, null, ignoreOtherReservations) && !GenAI.EnemyIsNear(pawn2, 40f))
+                __result = false;
+                return;
+            }
+            Thing thing = null;
+            if (ChildcareUtility.CanSuckle(pawn2, out ChildcareUtility.BreastfeedFailReason? _))
+            {
+                if (!HealthAIUtility.ShouldSeekMedicalRest(pawn2))
                 {
-                    //Thing thing = FindBed(pawn, pawn2);
-                    Thing thing = RestUtility.FindBedFor(pawn2, pawn, pawn2.HostFaction == pawn.Faction, checkSocialProperness: false);
-                    if (thing != null && pawn2.CanReserve(thing))
-                    {
-                        __result = true;
-                        return;
-                    }
                     __result = false;
                     return;
                 }
+                Building_Bed building_Bed;
+                if ((building_Bed = (ChildcareUtility.SafePlaceForBaby(pawn2, pawn).Thing as Building_Bed)) != null)
+                {
+                    thing = building_Bed;
+                }
+            }
+            else
+            {
+                //thing = FindBed(pawn, pawn2);
+                thing = RestUtility.FindBedFor(pawn2, pawn, false, false, pawn2.GuestStatus);
+            }
+            if (thing != null && pawn2.CanReserve(thing))
+            {
+                __result = true;
+                return;
             }
             __result = false;
             return;
         }
     }
 
-    //[HarmonyPatch(typeof(JobDriver_Repair))]
-    //[HarmonyPatch("MakeNewToils")]
-    class Patch_JobDriver_Repair_MakeNewToils
+    // BORROWED, THANKS
+    // https://github.com/emipa606/SeparateTreeChoppingPriority/pull/1/files
+    // https://github.com/emipa606/SeparateTreeChoppingPriority/blob/main/Source/TreesOnly/PlantUtility_PawnWillingToCutPlant_Job.cs
+    [HarmonyPatch(typeof(PlantUtility), "PawnWillingToCutPlant_Job")]
+    public static class PlantUtility_PawnWillingToCutPlant_Job
     {
-        // I wanted them to repair forbidden doors, but can't get it working.
-        static bool Prefix(JobDriver_Repair __instance, ref IEnumerable<Toil> __result)
+        public static bool Prefix(ref bool __result, Thing plant, Pawn pawn)
         {
-            JobDriver_Repair new_this = __instance;
-
-            List<Toil> new_result = new List<Toil>();
-
-            BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.NonPublic;
-
-            FieldInfo field_ticksToNextRepair = typeof(JobDriver_Repair).GetField("ticksToNextRepair", bindFlags);
-            float new_ticksToNextRepair = (float)field_ticksToNextRepair.GetValue(__instance);
-
-            PropertyInfo field_baseTargetThingA = typeof(JobDriver_Repair).GetProperty("TargetThingA", bindFlags);
-            Thing new_baseTargetThingA = (Thing)field_baseTargetThingA.GetValue(__instance);
-
-            PropertyInfo field_baseMap = typeof(JobDriver_Repair).GetProperty("Map", bindFlags);
-            Map new_baseMap = (Map)field_baseMap.GetValue(__instance);
-
-
-            //new_this.FailOnDespawnedOrNull(TargetIndex.A);
-            new_result.Add(Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.Touch));
-            Toil repair = new Toil();
-            repair.initAction = delegate
+            if (!plant.def.plant.IsTree)
             {
-                //ticksToNextRepair = 80f;
-                field_ticksToNextRepair.SetValue(__instance, 80f);
-            };
-            repair.tickAction = delegate
+                return true;
+            }
+
+            // Possibly block cutting down trees when considered for clearing place for other work.
+            if (pawn.workSettings?.WorkIsActive(WorkTypeDefOf.PlantCutting) == true)
             {
-                Pawn actor = repair.actor;
-                actor.skills.Learn(SkillDefOf.Construction, 0.05f);
-                float num = actor.GetStatValue(StatDefOf.ConstructionSpeed) * 1.7f;
-                //ticksToNextRepair -= num;
-                field_ticksToNextRepair.SetValue(__instance, ((float)field_ticksToNextRepair.GetValue(__instance)) - num);
+                return true;
+            }
 
-                if (((float)field_ticksToNextRepair.GetValue(__instance)) <= 0f)
-                {
-                    //ticksToNextRepair += 20f;
-                    field_ticksToNextRepair.SetValue(__instance, ((float)field_ticksToNextRepair.GetValue(__instance)) + 20f);
-
-                    new_baseTargetThingA.HitPoints++;
-                    new_baseTargetThingA.HitPoints = Mathf.Min(new_baseTargetThingA.HitPoints, new_baseTargetThingA.MaxHitPoints);
-                    new_baseMap.listerBuildingsRepairable.Notify_BuildingRepaired((Building)new_baseTargetThingA);
-                    if (new_baseTargetThingA.HitPoints == new_baseTargetThingA.MaxHitPoints)
-                    {
-                        actor.records.Increment(RecordDefOf.ThingsRepaired);
-                        actor.jobs.EndCurrentJob(JobCondition.Succeeded);
-                    }
-                }
-            };
-            repair.FailOnCannotTouch(TargetIndex.A, PathEndMode.Touch);
-            repair.WithEffect(new_baseTargetThingA.def.repairEffect, TargetIndex.A);
-            repair.defaultCompleteMode = ToilCompleteMode.Never;
-            repair.activeSkill = (() => SkillDefOf.Construction);
-            new_result.Add(repair);
-            __result = new_result.AsEnumerable<Toil>();
+            __result = false;
             return false;
         }
     }
