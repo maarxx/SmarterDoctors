@@ -2,7 +2,7 @@
 
 This is a mod for the game RimWorld by Ludeon Studios.
 
-It helps many more Jobs are done in a smart priority sorted order, instead of just randomly.
+For various types of Work, the mod helps pawns prioritize all of the similar tasks, instead of doing them randomly.
 
 We're on Steam: https://steamcommunity.com/sharedfiles/filedetails/?id=2324533248
 
@@ -13,11 +13,7 @@ We're on Steam: https://steamcommunity.com/sharedfiles/filedetails/?id=232453324
 
 # Introduction
 
-You'll add the mod. You'll enable the mod.
-
-There is no GUI, and no options. It just works.
-
-It helps many more Jobs are done in a smart priority sorted order, instead of just randomly.
+For various types of Work, the mod helps pawns prioritize all of the similar tasks, instead of doing them randomly.
 
 # Explanation
 
