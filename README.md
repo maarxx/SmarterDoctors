@@ -2,7 +2,7 @@
 
 This is a mod for the game RimWorld by Ludeon Studios.
 
-For various types of Work, the mod helps pawns prioritize all of the similar tasks, instead of doing them randomly.
+The mod helps pawns prioritize all of the similar tasks, instead of doing them randomly, within any given type of Work.
 
 We're on Steam: https://steamcommunity.com/sharedfiles/filedetails/?id=2324533248
 
