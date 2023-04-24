@@ -29,6 +29,4 @@ For Plant Cutting, all things being equal, Haygrass is done last.
 
 For Construction, floors are a lower priority, and the spike trap is an even lower priority (it takes a disproportionate amount of work, especially if you have lots of them, and you don't want it to distract from building coolers/heaters/beds).
 
-Pawns no longer try to cut trees (even blocking construction or roofs) unless they are assigned to Cut Plants too.
-
 For Rescue to Bed, colonists are rescued before animals.
