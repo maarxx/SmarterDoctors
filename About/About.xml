@@ -3,7 +3,9 @@
   <name>SmarterDoctors</name>
   <author>Maarx</author>
   <url>https://github.com/maarxx/SmarterDoctors/</url>
-  <description>Many more Jobs are done in a smart priority sorted order, instead of just randomly.</description>
+  <description>
+For various types of Work, the mod helps pawns prioritize all of the similar tasks, instead of doing them randomly.
+  </description>
   <packageId>maarx.smarterdoctors</packageId>
   <supportedVersions>
     <li>1.2</li>
