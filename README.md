@@ -9,13 +9,11 @@ We're on Steam: https://steamcommunity.com/sharedfiles/filedetails/?id=232453324
 # Table of Contents
 
 * [Introduction](#introduction)
-* [Explanation](#explanation)
+* [Links](#links)
 
 # Introduction
 
-For various types of Work, the mod helps pawns prioritize all of the similar tasks, instead of doing them randomly.
-
-# Explanation
+The mod helps pawns prioritize all of the similar tasks, instead of doing them randomly, within any given type of Work.
 
 As the inspiring primary feature, Doctors now treat patients in order of Fatal Disease Delta (Immunity - Severity), and then bleeding patients in order of time to bleed out.
 
@@ -30,3 +28,11 @@ For Plant Cutting, all things being equal, Haygrass is done last.
 For Construction, floors are a lower priority, and the spike trap is an even lower priority (it takes a disproportionate amount of work, especially if you have lots of them, and you don't want it to distract from building coolers/heaters/beds).
 
 For Rescue to Bed, colonists are rescued before animals.
+
+# Links
+
+We're on Steam: https://steamcommunity.com/sharedfiles/filedetails/?id=2324533248
+
+We're on GitHub: https://github.com/maarxx/SmarterDoctors
+
+For reporting bugs or requesting features, Github Issues are better than Steam Workshop Comments.
