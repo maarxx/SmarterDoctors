@@ -32,5 +32,7 @@ For Rescue to Bed, colonists are rescued before animals.
 # Links
 
 We're on Steam: https://steamcommunity.com/sharedfiles/filedetails/?id=2324533248
+
 We're on GitHub: https://github.com/maarxx/SmarterDoctors
+
 For reporting bugs or requesting features, Github Issues are better than Steam Workshop Comments.
