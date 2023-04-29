@@ -13,7 +13,7 @@ We're on Steam: https://steamcommunity.com/sharedfiles/filedetails/?id=232453324
 
 # Introduction
 
-For various types of Work, the mod helps pawns prioritize all of the similar tasks, instead of doing them randomly.
+The mod helps pawns prioritize all of the similar tasks, instead of doing them randomly, within any given type of Work.
 
 As the inspiring primary feature, Doctors now treat patients in order of Fatal Disease Delta (Immunity - Severity), and then bleeding patients in order of time to bleed out.
 
